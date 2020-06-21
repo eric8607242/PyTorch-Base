@@ -41,6 +41,9 @@ if __name__ == "__main__":
     layers_config = lookup_table.decode_arch_param(arch_param)
     model = Model(layers_config, CONFIG.dataset, CONFIG.classes)    
 
+    if CONFIG.model_pretrained is not None:
+        model.load_state_dict(torch.load(CONFIG.model_pretrained)["model"])
+
     model = model.to(device)
     if (device.type == "cuda" and CONFIG.ngpu >= 1):
         model = nn.DataParallel(model, list(range(CONFIG.ngpu)))
@@ -52,7 +55,7 @@ if __name__ == "__main__":
 
     start_time = time.time()
     trainer = Trainer(criterion, optimizer, scheduler, writer, device, CONFIG)
-    trainer.train_loop(train_loader, test_loader, model)
+    test_top1_avg = trainer.validate(model, test_loader, 0)
     logging.info("Total training time : {:.2f}".format(time.time() - start_time))
     
 

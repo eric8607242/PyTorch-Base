@@ -54,5 +54,4 @@ def get_imagenet(train_transform, val_transform, test_transform, CONFIG):
     return train_data, val_data, test_data
 
 
-    
 
